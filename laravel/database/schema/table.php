@@ -19,6 +19,20 @@ class Table {
 	public $connection;
 
 	/**
+	 * Table charset value.
+	 *
+	 * @var string
+	 */
+	public $charset = 'utf8';
+
+	/**
+	 * Character collation to use for the charset. Only used if the charset is also set.
+	 *
+	 * @var string
+	 */
+	public $collation;
+
+	/**
 	 * The engine that should be used for the table.
 	 *
 	 * @var string

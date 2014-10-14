@@ -33,6 +33,16 @@ class MySQL extends Grammar {
 			$sql .= ' ENGINE = '.$table->engine;
 		}
 
+		if ( ! is_null($table->charset))
+		{
+		     $sql .= ' CHARACTER SET ' . $table->charset;
+
+		     if ( ! is_null($table->collation))
+		     {
+		         $sql .= ' COLLATE ' . $table->collation;
+		     }
+		 }
+
 		return $sql;
 	}
 
