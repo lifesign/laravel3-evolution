@@ -328,7 +328,7 @@ function head($array)
  */
 function url($url = '', $https = null)
 {
-	return URL::to($url, $https);
+	return Laravel\URL::to($url, $https);
 }
 
 /**
@@ -340,7 +340,7 @@ function url($url = '', $https = null)
  */
 function asset($url, $https = null)
 {
-	return URL::to_asset($url, $https);
+	return Laravel\URL::to_asset($url, $https);
 }
 
 /**
@@ -360,7 +360,7 @@ function asset($url, $https = null)
  */
 function action($action, $parameters = array())
 {
-	return URL::to_action($action, $parameters);
+	return Laravel\URL::to_action($action, $parameters);
 }
 
 /**
@@ -380,7 +380,7 @@ function action($action, $parameters = array())
  */
 function route($name, $parameters = array())
 {
-	return URL::to_route($name, $parameters);
+	return Laravel\URL::to_route($name, $parameters);
 }
 
 /**
@@ -560,9 +560,9 @@ function render_each($partial, array $data, $iterator, $empty = 'raw|')
  * @param  string  $section
  * @return string
  */
-function yield($section)
+function yield_content($section)
 {
-	return Section::yield($section);
+	return Laravel\Section::yield_content($section);
 }
 
 /**
@@ -584,7 +584,7 @@ function get_cli_option($option, $default = null)
 
 	return value($default);
 }
-	
+
 /**
  * Calculate the human-readable file size (with proper units).
  *
