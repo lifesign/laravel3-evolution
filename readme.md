@@ -1,11 +1,13 @@
-# [Laravel](http://laravel.com) - A PHP Framework For Web Artisans
+# Laravel3 Evolution
 
-Laravel is a clean and classy framework for PHP web development. Freeing you
-from spaghetti code, Laravel helps you create wonderful applications using
-simple, expressive syntax. Development should be a creative experience that you
-enjoy, not something that is painful. Enjoy the fresh air.
+[![Build Status](https://travis-ci.org/lifesign/laravel3-evolution.svg)](https://travis-ci.org/lifesign/laravel3-evolution)
 
-[Official Website & Documentation](http://laravel.com)
+Laravel3 is a milestone. Due to laravel3.2.14 is not maintain by official any more,
+This repository aims to update some core file and maybe port some cool feature form laravel4.
+Hope you enjoy it~
+
+The official Documentation is not accessible, Try the below one.
+[Documentation](http://laravel3.veliovgroup.com/docs)
 
 ## Feature Overview
 
