@@ -66,6 +66,9 @@ return array(
 
 		array('host' => '127.0.0.1', 'port' => 11211, 'weight' => 100),
 
-	),	
+	),
 
+	'memcache' => array(
+        array('host' => '192.168.3.152', 'port' => 11212, 'persistent' => true, 'weight' => 100, 'timeout' => 1),
+    ),
 );

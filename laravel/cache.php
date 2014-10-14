@@ -70,6 +70,9 @@ class Cache {
 			case 'memcached':
 				return new Cache\Drivers\Memcached(Memcached::connection(), Config::get('cache.key'));
 
+            case 'memcache':
+                return new Cache\Drivers\Memcache(Memcache::connection(), Config::get('cache.key'));
+
 			case 'memory':
 				return new Cache\Drivers\Memory;
 
