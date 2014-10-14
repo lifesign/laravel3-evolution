@@ -34,11 +34,11 @@ class InputOption
     /**
      * Constructor.
      *
-     * @param string  $name        The option name
-     * @param string  $shortcut    The shortcut (can be null)
-     * @param integer $mode        The option mode: One of the VALUE_* constants
-     * @param string  $description A description text
-     * @param mixed   $default     The default value (must be null for self::VALUE_REQUIRED or self::VALUE_NONE)
+     * @param string       $name        The option name
+     * @param string|array $shortcut    The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
+     * @param int          $mode        The option mode: One of the VALUE_* constants
+     * @param string       $description A description text
+     * @param mixed        $default     The default value (must be null for self::VALUE_REQUIRED or self::VALUE_NONE)
      *
      * @throws \InvalidArgumentException If option mode is invalid or incompatible
      *
@@ -50,13 +50,24 @@ class InputOption
             $name = substr($name, 2);
         }
 
+        if (empty($name)) {
+            throw new \InvalidArgumentException('An option name cannot be empty.');
+        }
+
         if (empty($shortcut)) {
             $shortcut = null;
         }
 
         if (null !== $shortcut) {
-            if ('-' === $shortcut[0]) {
-                $shortcut = substr($shortcut, 1);
+            if (is_array($shortcut)) {
+                $shortcut = implode('|', $shortcut);
+            }
+            $shortcuts = preg_split('{(\|)-?}', ltrim($shortcut, '-'));
+            $shortcuts = array_filter($shortcuts);
+            $shortcut = implode('|', $shortcuts);
+
+            if (empty($shortcut)) {
+                throw new \InvalidArgumentException('An option shortcut cannot be empty.');
             }
         }
 
@@ -101,7 +112,7 @@ class InputOption
     /**
      * Returns true if the option accepts a value.
      *
-     * @return Boolean true if value mode is not self::VALUE_NONE, false otherwise
+     * @return bool    true if value mode is not self::VALUE_NONE, false otherwise
      */
     public function acceptValue()
     {
@@ -111,7 +122,7 @@ class InputOption
     /**
      * Returns true if the option requires a value.
      *
-     * @return Boolean true if value mode is self::VALUE_REQUIRED, false otherwise
+     * @return bool    true if value mode is self::VALUE_REQUIRED, false otherwise
      */
     public function isValueRequired()
     {
@@ -121,7 +132,7 @@ class InputOption
     /**
      * Returns true if the option takes an optional value.
      *
-     * @return Boolean true if value mode is self::VALUE_OPTIONAL, false otherwise
+     * @return bool    true if value mode is self::VALUE_OPTIONAL, false otherwise
      */
     public function isValueOptional()
     {
@@ -131,7 +142,7 @@ class InputOption
     /**
      * Returns true if the option can take multiple values.
      *
-     * @return Boolean true if mode is self::VALUE_IS_ARRAY, false otherwise
+     * @return bool    true if mode is self::VALUE_IS_ARRAY, false otherwise
      */
     public function isArray()
     {
@@ -148,7 +159,7 @@ class InputOption
     public function setDefault($default = null)
     {
         if (self::VALUE_NONE === (self::VALUE_NONE & $this->mode) && null !== $default) {
-            throw new \LogicException('Cannot set a default value when using Option::VALUE_NONE mode.');
+            throw new \LogicException('Cannot set a default value when using InputOption::VALUE_NONE mode.');
         }
 
         if ($this->isArray()) {
@@ -186,7 +197,7 @@ class InputOption
      * Checks whether the given option equals this one
      *
      * @param InputOption $option option to compare
-     * @return Boolean
+     * @return bool
      */
     public function equals(InputOption $option)
     {
