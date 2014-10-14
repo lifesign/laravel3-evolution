@@ -1,6 +1,7 @@
 .anbu * {
 	color: black;
 	border: 0 !important;
+	text-align: left;
 }
 
 .anbu
@@ -185,6 +186,13 @@
 	background-color:#eee !important;
 	border-right:1px solid #ccc !important;
 	width:10% !important;
+}
+
+.anbu-table-first-wide
+{
+	background-color:#eee !important;
+	border-right:1px solid #ccc !important;
+	width:70% !important;
 }
 
 span.anbu-count

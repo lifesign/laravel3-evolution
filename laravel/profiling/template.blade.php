@@ -22,7 +22,7 @@
 						</tr>
 					</table>
 				@else
-					<span class="anbu-empty">There are no log entries.</span>				
+					<span class="anbu-empty">There are no log entries.</span>
 				@endif
 			</div>
 
@@ -87,12 +87,27 @@
 									<td>&nbsp;</td>
 								</tr>
 							@endif
-							
+
 							@endforeach
-						</table>			
+						</table>
 				@else
 					<span class="anbu-empty">There have been no checkpoints set.</span>
 				@endif
+			</div>
+
+			<div class="anbu-tab-pane anbu-table anbu-filecount">
+				<table>
+					<tr>
+						<th>File</th>
+						<th>Size</th>
+					</tr>
+					@foreach($files as $file)
+					<tr>
+						<td class="anbu-table-first-wide">{{$file['filePath']}}</td>
+						<td><pre>{{$file['size']}}</pre></td>
+					</tr>
+					@endforeach
+				</table>
 			</div>
 		</div>
 	</div>
@@ -100,7 +115,7 @@
 	<ul id="anbu-open-tabs" class="anbu-tabs">
 		<li><a data-anbu-tab="anbu-log" class="anbu-tab" href="#">Log <span class="anbu-count">{{ count($logs) }}</span></a></li>
 		<li>
-			<a data-anbu-tab="anbu-sql" class="anbu-tab" href="#">SQL 
+			<a data-anbu-tab="anbu-sql" class="anbu-tab" href="#">SQL
 				<span class="anbu-count">{{ count($queries) }}</span>
 				@if (count($queries))
 				<span class="anbu-count">{{ number_format(array_sum(array_pluck($queries, '1')), 2) }}ms</span>
@@ -109,6 +124,7 @@
 		</li>
 		<li><a class="anbu-tab" data-anbu-tab="anbu-checkpoints">Time <span class="anbu-count">{{ $time }}ms</span></a></li>
 		<li><a class="anbu-tab">Memory <span class="anbu-count">{{ $memory }} ({{ $memory_peak }})</span></a></li>
+		<li><a class="anbu-tab" data-anbu-tab="anbu-filecount">Files <span class="anbu-count">{{count($files)}}</span></a></li>
 		<li class="anbu-tab-right"><a id="anbu-hide" href="#">&#8614;</a></li>
 		<li class="anbu-tab-right"><a id="anbu-close" href="#">&times;</a></li>
 		<li class="anbu-tab-right"><a id="anbu-zoom" href="#">&#8645;</a></li>

@@ -14,8 +14,8 @@ class Profiler {
 	 *
 	 * @var array
 	 */
-	protected static $data = array('queries' => array(), 'logs' => array(), 'timers' => array());
-	
+	protected static $data = array('queries' => array(), 'logs' => array(), 'timers' => array(), 'files' => array());
+
 	/**
 	 * Get the rendered contents of the Profiler.
 	 *
@@ -37,6 +37,7 @@ class Profiler {
 				$timer['running_time'] = number_format((microtime(true) - $timer['start'] ) * 1000, 2);
 			}
 
+			static::getIncludedFiles();
 			return render('path: '.__DIR__.'/template'.BLADE_EXT, static::$data);
 		}
 	}
@@ -60,7 +61,7 @@ class Profiler {
 		{
 			$name = $name.uniqid();
 		}
-		
+
 		// Push the time into the timers array for display
 		static::$data['timers'][$name]['start'] = $start;
 		static::$data['timers'][$name]['end'] = $end;
@@ -146,12 +147,36 @@ class Profiler {
 		foreach ($bindings as $binding)
 		{
 			$binding = Database::escape($binding);
-			
+
 			$sql = preg_replace('/\?/', $binding, $sql, 1);
 			$sql = htmlspecialchars($sql, ENT_QUOTES, 'UTF-8', false);
 		}
 
 		static::$data['queries'][] = array($sql, $time);
+	}
+
+	/**
+	 * Get all of the files that have been included.
+	 *
+	 * @return array
+	 */
+	public static function getIncludedFiles()
+	{
+		// We'll cache this internally to avoid running this
+		// multiple times.
+		if(empty(static::$data['files']))
+		{
+			$files = get_included_files();
+
+			foreach($files as $filePath)
+			{
+				$size = get_file_size(filesize($filePath));
+
+				static::$data['files'][] = compact('filePath', 'size');
+			}
+		}
+
+		return static::$data['files'];
 	}
 
 	/**
@@ -171,7 +196,7 @@ class Profiler {
 
 		Event::listen('laravel.query', function($sql, $bindings, $time)
 		{
-			Profiler::query($sql, $bindings, $time);			
+			Profiler::query($sql, $bindings, $time);
 		});
 
 		// We'll attach the profiler to the "done" event so that we can easily
