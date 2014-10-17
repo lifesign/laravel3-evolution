@@ -7,7 +7,14 @@ This repository aims to update some core file and maybe port some cool feature f
 Hope you enjoy it~
 
 The official Documentation is not accessible, Try the below one.
+
 [Documentation](http://laravel3.veliovgroup.com/docs)
+
+## Changes
+- add serve command for local develop just use `php artisan serve` like l4.
+- add include_files for anbu profiler.
+- fix yield keyword problem in php5.5.
+- update symfony core to the latest.
 
 ## Feature Overview
 
@@ -54,16 +61,6 @@ Route::get('user/(:num)', function($id)
 return Redirect::to('profile')->with('message', 'Welcome Back!');
 ```
 
-## Contributing to Laravel
-
-Contributions are encouraged and welcome; however, please review the Developer
-Certificate of Origin in the "license.txt" file included in the repository. All
-commits must be signed off using the `-s` switch.
-
-```bash
-git commit -s -m "this commit will be signed off automatically!"
-```
-
 ## License
 
-Laravel is open-sourced software licensed under the MIT License.
+Laravel3_Evolution is open-sourced software licensed under the MIT License.
