@@ -1,5 +1,7 @@
 <?php namespace Laravel;
 
+use Laravel\Profiling\Profiler;
+
 class Event {
 
 	/**
@@ -196,6 +198,10 @@ class Event {
 			{
 				foreach (static::$events[$event] as $callback)
 				{
+					//add profile to watch event
+					//TODO not hard coding profiler here
+					Profiler::event($event, param_str($parameters));
+
 					$response = call_user_func_array($callback, $parameters);
 
 					// If the event is set to halt, we will return the first response

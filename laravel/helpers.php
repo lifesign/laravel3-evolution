@@ -596,3 +596,25 @@ function get_file_size($size)
 	$units = array('Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB');
 	return @round($size / pow(1024, ($i = floor(log($size, 1024)))), 2).' '.$units[$i];
 }
+
+/**
+ * Covery params into string
+ * @param  [mixed] $params
+ * @return [string]
+ */
+function param_str($params)
+{
+	$toStr = function ($value) {
+		if (!is_scalar($value)) {
+			return gettype($value);
+		} elseif ($value === '') {
+			return "''";
+		} elseif (strlen("$value") > 20) {
+			return substr("$value", 0, 15).'...';
+		} else {
+			return $value;
+		}
+	};
+
+    return join(' | ', array_map($toStr, $params));
+}

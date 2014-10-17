@@ -14,7 +14,7 @@ class Profiler {
 	 *
 	 * @var array
 	 */
-	protected static $data = array('queries' => array(), 'logs' => array(), 'timers' => array(), 'files' => array());
+	protected static $data = array('queries' => array(), 'logs' => array(), 'timers' => array(), 'files' => array(), 'events' => array());
 
 	/**
 	 * Get the rendered contents of the Profiler.
@@ -153,6 +153,19 @@ class Profiler {
 		}
 
 		static::$data['queries'][] = array($sql, $time);
+	}
+
+
+	/**
+	 * Add a evnent log
+	 *
+	 * @param  string  $type
+	 * @param  string  $message
+	 * @return void
+	 */
+	public static function event($name, $params = null)
+	{
+		static::$data['events'][] = array($name, $params);
 	}
 
 	/**
