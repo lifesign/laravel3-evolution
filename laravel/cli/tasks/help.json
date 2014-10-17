@@ -5,6 +5,12 @@
 			"command": "php artisan key:generate"
 		}
 	},
+	"Develop": {
+		"serve": {
+			"description": "For local Develop",
+			"command": "php artisan serve --port={num}"
+		}
+	},
 	"Database Tables": {
 		"session:table": {
 			"description": "Generate a migration for the sessions database table.",
@@ -54,7 +60,7 @@
 			"description": "Delete all bundles' assets from the public directory.",
 			"command": "php artisan bundle:unpublish"
 		}
-	},	
+	},
 	"Unit Testing": {
 		"test": {
 			"description": "Run the application's tests.",

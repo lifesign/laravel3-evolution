@@ -90,7 +90,6 @@ $paths['public'] = 'public';
                                               :bb ,'
                                               ~~~~
 */
-
 // --------------------------------------------------------------
 // Change to the current working directory.
 // --------------------------------------------------------------
@@ -120,29 +119,37 @@ foreach ($paths as $name => $path)
 	}
 }
 
-/**
- * A global path helper function.
- *
- * <code>
- *     $storage = path('storage');
- * </code>
- *
- * @param  string  $path
- * @return string
- */
-function path($path)
+
+if (! function_exists('path'))
 {
-	return $GLOBALS['laravel_paths'][$path];
+    /**
+     * A global path helper function.
+     *
+     * <code>
+     *     $storage = path('storage');
+     * </code>
+     *
+     * @param  string  $path
+     * @return string
+     */
+    function path($path)
+    {
+        return $GLOBALS['laravel_paths'][$path];
+    }
 }
 
-/**
- * A global path setter function.
- *
- * @param  string  $path
- * @param  string  $value
- * @return void
- */
-function set_path($path, $value)
+if (! function_exists('set_path'))
 {
-	$GLOBALS['laravel_paths'][$path] = $value;
+    /**
+     * A global path setter function.
+     *
+     * @param  string  $path
+     * @param  string  $value
+     * @return void
+     */
+    function set_path($path, $value)
+    {
+        $GLOBALS['laravel_paths'][$path] = $value;
+    }
 }
+
