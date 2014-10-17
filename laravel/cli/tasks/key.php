@@ -2,6 +2,8 @@
 
 use Laravel\Str;
 use Laravel\File;
+use Laravel\Config;
+use Laravel\Request;
 
 class Key extends Task {
 
@@ -19,7 +21,9 @@ class Key extends Task {
 	 */
 	public function __construct()
 	{
-		$this->path = path('app').'config/application'.EXT;
+		$this->env = Request::env() ? Request::env().'/' : '';
+
+		$this->path = path('app')."config/{$this->env}application".EXT;
 	}
 
 	/**
@@ -36,22 +40,19 @@ class Key extends Task {
 		// specified through the CLI.
 		$key = Str::random(array_get($arguments, 0, 32));
 
-		$config = File::get($this->path);
+		if (File::exists($this->path)) {
+			$config = File::get($this->path);
+			$key_placeholder = Config::get('application.key');
 
-		$config = str_replace("'key' => '',", "'key' => '{$key}',", $config, $count);
+			$config = str_replace("'key' => '{$key_placeholder}'", "'key' => '{$key}'", $config);
 
-		File::put($this->path, $config);
+			File::put($this->path, $config);
 
-		if ($count > 0)
-		{
-			echo "Configuration updated with secure key!";
-		}
-		else
-		{
-			echo "An application key already exists!";
+			$this->info("An application key {$key} set successfully.");
+		} else {
+			$this->info("Config/{$this->env}application.php does not exist!");
 		}
 
-		echo PHP_EOL;
 	}
 
 }
