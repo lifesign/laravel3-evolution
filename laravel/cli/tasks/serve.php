@@ -19,6 +19,11 @@ class Serve extends Task {
         $this->info("Laravel development server listen on http://{$host}:{$port}");
         ob_end_flush();
 
+        //little sugar for windows
+        if (substr(PHP_OS, 0, 3) === 'WIN') {
+            passthru("start http://{$host}:{$port}");
+        }
+
         passthru('"'.PHP_BINARY.'"'." -S {$host}:{$port} -t \"{$public}\" server.php");
     }
 
