@@ -1,58 +1,44 @@
 <?php
 
 /**
- * Load the Markdown library.
- */
-require_once __DIR__.'/libraries/markdown.php';
-
-/**
- * Get the root path for the documentation Markdown.
- *
- * @return string
- */
-function doc_root()
-{
-	return path('sys').'documentation/';
-}
-
-/**
- * Get the parsed Markdown contents of a given page.
- *
- * @param  string  $page
- * @return string
- */
-function document($page)
-{
-	return Markdown(file_get_contents(doc_root().$page.'.md'));
-}
-
-/**
- * Determine if a documentation page exists.
- *
- * @param  string  $page
- * @return bool
- */
-function document_exists($page)
-{
-	return file_exists(doc_root().$page.'.md');
-}
-
-/**
- * Attach the sidebar to the documentation template.
- */
-View::composer('docs::template', function($view)
-{
-	$view->with('sidebar', document('contents'));
-});
-
-/**
  * Handle the documentation homepage.
  *
  * This page contains the "introduction" to Laravel.
  */
+
 Route::get('(:bundle)', function()
 {
-	return View::make('docs::page')->with('content', document('home'));
+	$bundles = array();
+
+	$registered_bundles = Bundle::all();
+	$registered_bundles[DEFAULT_BUNDLE] = array();
+
+	foreach ($registered_bundles as $bundle => $config)
+	{
+		if ( ! is_null(docs_root($bundle)))
+		{
+			$bundles[] = $bundle;
+		}
+	}
+
+	// We need to get all available bundle
+	return View::make('docs::page')
+			->with('bundle', 'docs')
+			->with('content', View::make('docs::list', array('bundles' => $bundles)));
+});
+
+Route::get('(:bundle)/(:any)', function($bundle)
+{
+	if (docs_document_exists($bundle, 'home'))
+	{
+		return View::make('docs::page')
+			->with('bundle', $bundle)
+			->with('content', docs_document($bundle, 'home'));
+	}
+	else
+	{
+		return Response::error('404');
+	}
 });
 
 /**
@@ -62,21 +48,25 @@ Route::get('(:bundle)', function()
  * @param  string  $page
  * @return mixed
  */
-Route::get('(:bundle)/(:any)/(:any?)', function($section, $page = null)
+Route::get('(:bundle)/(:any)/(:any?)/(:any?)', function($bundle, $page = null)
 {
-	$file = rtrim(implode('/', func_get_args()), '/');
+	$segments = func_get_args();
+	$bundle   = array_shift($segments);
+	$file     = rtrim(implode('/', $segments), '/');
 
 	// If no page was specified, but a "home" page exists for the section,
 	// we'll set the file to the home page so that the proper page is
 	// displayed back out to the client for the requested doc page.
-	if (is_null($page) and document_exists($file.'/home'))
+	if (is_null($page) and docs_document_exists($bundle, $file.'/home'))
 	{
 		$file .= '/home';
 	}
 
-	if (document_exists($file))
+	if (docs_document_exists($bundle, $file))
 	{
-		return View::make('docs::page')->with('content', document($file));
+		return View::make('docs::page')
+				->with('bundle', $bundle)
+				->with('content', docs_document($bundle, $file));
 	}
 	else
 	{
