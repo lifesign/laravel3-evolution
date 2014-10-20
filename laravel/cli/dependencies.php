@@ -149,3 +149,15 @@ if (! Ioc::registered('task: serve'))
 		return new Tasks\Serve;
 	});
 }
+
+
+/**
+ * The "Cache" task clear the application cache
+ */
+if (! Ioc::registered('task: cache'))
+{
+	Ioc::singleton('task: cache', function()
+	{
+		return new Tasks\Cache;
+	});
+}

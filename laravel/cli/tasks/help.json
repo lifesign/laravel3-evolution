@@ -5,6 +5,12 @@
 			"command": "php artisan key:generate"
 		}
 	},
+	"Cache": {
+		"clear": {
+			"description": "Flush Application Cache",
+			"command": "php artisan cache:clear"
+		}
+	},
 	"Develop": {
 		"serve": {
 			"description": "For local Develop",
