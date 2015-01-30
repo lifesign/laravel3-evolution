@@ -12,6 +12,20 @@ class Event {
 	public static $events = array();
 
 	/**
+	 * The wildcard events.
+	 *
+	 * @var array
+	 */
+	public static $wildcards = array();
+
+	/**
+	 * The sorted event events.
+	 *
+	 * @var array
+	 */
+	public static $sorted = array();
+
+	/**
 	 * The queued events waiting for flushing.
 	 *
 	 * @var array
@@ -45,15 +59,45 @@ class Event {
 	 *
 	 *		// Register an object instance callback for the given event
 	 *		Event::listen('event', array($object, 'method'));
+	 *
+	 * 		//Register same callback with multiple events
+	 * 		Event::listen(array('start', 'over'), function(){return 'ring';});
+	 *
 	 * </code>
 	 *
 	 * @param  string  $event
 	 * @param  mixed   $callback
+	 * @param  int     $priority
 	 * @return void
 	 */
-	public static function listen($event, $callback)
+	public static function listen($events, $callback, $priority = 0)
 	{
-		static::$events[$event][] = $callback;
+		foreach ((array)$events as $event)
+		{
+
+			if (str_contains($event, '*'))
+			{
+				static::setupWildcardListen($event, $callback);
+			}
+			else
+			{
+				static::$events[$event][$priority][] = $callback;
+
+				unset(static::$sorted[$event]);
+			}
+		}
+	}
+
+	/**
+	 * Setup a wildcard listener callback.
+	 *
+	 * @param  string  $event
+	 * @param  mixed   $listener
+	 * @return void
+	 */
+	public static function setupWildcardListen($event, $listener)
+	{
+		static::$wildcards[$event][] = $listener;
 	}
 
 	/**
@@ -63,11 +107,11 @@ class Event {
 	 * @param  mixed   $callback
 	 * @return void
 	 */
-	public static function override($event, $callback)
+	public static function override($event, $callback, $priority = 0)
 	{
 		static::clear($event);
 
-		static::listen($event, $callback);
+		static::listen($event, $callback, $priority);
 	}
 
 	/**
@@ -104,6 +148,8 @@ class Event {
 	public static function clear($event)
 	{
 		unset(static::$events[$event]);
+
+		unset(static::$sorted[$event]);
 	}
 
 	/**
@@ -194,33 +240,88 @@ class Event {
 		// an array of event responses and return the array.
 		foreach ((array) $events as $event)
 		{
-			if (static::listeners($event))
+			foreach (static::getListeners($event) as $callback)
 			{
-				foreach (static::$events[$event] as $callback)
+				//add profile to watch event
+				//TODO not hard coding profiler here
+				Profiler::event($event, param_str($parameters));
+
+				$response = call_user_func_array($callback, $parameters);
+
+				// If the event is set to halt, we will return the first response
+				// that is not null. This allows the developer to easily stack
+				// events but still get the first valid response.
+				if ($halt and ! is_null($response))
 				{
-					//add profile to watch event
-					//TODO not hard coding profiler here
-					Profiler::event($event, param_str($parameters));
-
-					$response = call_user_func_array($callback, $parameters);
-
-					// If the event is set to halt, we will return the first response
-					// that is not null. This allows the developer to easily stack
-					// events but still get the first valid response.
-					if ($halt and ! is_null($response))
-					{
-						return $response;
-					}
-
-					// After the handler has been called, we'll add the response to
-					// an array of responses and return the array to the caller so
-					// all of the responses can be easily examined.
-					$responses[] = $response;
+					return $response;
 				}
+
+				// After the handler has been called, we'll add the response to
+				// an array of responses and return the array to the caller so
+				// all of the responses can be easily examined.
+				$responses[] = $response;
 			}
 		}
 
 		return $halt ? null : $responses;
+	}
+
+
+	/**
+	 * Get all of the listeners for a given event name.
+	 *
+	 * @param  string  $eventName
+	 * @return array
+	 */
+	public static function getListeners($eventName)
+	{
+		$wildcards = static::getWildcardListeners($eventName);
+
+		if ( ! isset(static::$sorted[$eventName]))
+		{
+			static::sortListeners($eventName);
+		}
+
+		return array_merge(static::$sorted[$eventName], $wildcards);
+	}
+
+	/**
+	 * Get the wildcard listeners for the event.
+	 *
+	 * @param  string  $eventName
+	 * @return array
+	 */
+	public static function getWildcardListeners($eventName)
+	{
+		$wildcards = array();
+
+		foreach (static::$wildcards as $key => $listeners)
+		{
+			if (Str::is($key, $eventName)) $wildcards = array_merge($wildcards, $listeners);
+		}
+
+		return $wildcards;
+	}
+
+	/**
+	 * Sort the listeners for a given event by priority.
+	 *
+	 * @param  string  $eventName
+	 * @return array
+	 */
+	public static function sortListeners($eventName)
+	{
+		static::$sorted[$eventName] = array();
+
+		// If listeners exist for the given event, we will sort them by the priority
+		// so that we can call them in the correct order. We will cache off these
+		// sorted event listeners so we do not have to re-sort on every events.
+		if (isset(static::$events[$eventName]))
+		{
+			krsort(static::$events[$eventName]);
+
+			static::$sorted[$eventName] = call_user_func_array('array_merge', static::$events[$eventName]);
+		}
 	}
 
 }
