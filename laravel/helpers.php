@@ -1,5 +1,7 @@
 <?php
 
+use Laravel\Debug\Dumper;
+
 /**
  * Convert HTML characters to entities.
  *
@@ -34,9 +36,7 @@ function __($key, $replacements = array(), $language = null)
  */
 function dd($value)
 {
-	echo "<pre>";
-	var_dump($value);
-	echo "</pre>";
+	array_map(function($x) { with(new Dumper)->dump($x); }, func_get_args());
 	die;
 }
 
